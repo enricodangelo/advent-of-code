@@ -16,8 +16,8 @@ function isATree(cell) {
     return cell === "#";
 }
 
-function getCell(row, rowN, rightMoves) {
-    const coordinate = (rowN * rightMoves) % row.length;
+function getCell(row, colN) {
+    const coordinate = colN % row.length;
     return row[coordinate];
 }
 
@@ -25,8 +25,8 @@ function countTrees(field, rightMoves, downMoves) {
     let count = 0;
 
     const rows = field.length;
-    for (let rowN = 0; rowN < rows; rowN += downMoves) {
-        const cell = getCell(field[rowN], rowN, rightMoves);
+    for (let rowN = 0, colN = 0; rowN < rows; rowN += downMoves, colN += rightMoves) {
+        const cell = getCell(field[rowN], colN);
         if (isATree(cell)) {
             count++;
         }
