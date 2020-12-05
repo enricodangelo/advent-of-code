@@ -1,7 +1,6 @@
 const fs = require('fs');
 
 const mandatoryFields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-const optionalFields = ["cid"];
 
 function readInput(filename) {
     const res = [];
