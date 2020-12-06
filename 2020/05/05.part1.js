@@ -11,6 +11,7 @@ function readInput(filename) {
 
     return res;
 }
+
 function getRowAndColumn(seat) {
     const rowPart = seat.slice(0, 7);
     const columnPart = seat.slice(7);
