@@ -1,57 +1,75 @@
 const fs = require('fs');
 
+class Node {
+    name;
+    neighbours;
+
+    constructor(name, neighbours) {
+        this.name = name;
+        this.neighbours = neighbours;
+    }
+
+    static parse(s) {
+        const firstLevelParts = s.split("bags contain");
+        const name = firstLevelParts[0].trim();
+        const neighbours = [];
+        if (firstLevelParts[1].trim() !== "no other bags.") {
+            for (const neighbourPart of firstLevelParts[1].split(",")) {
+                const neighbour = neighbourPart.trim().split("bag")[0].trim().split(" ").slice(1).join(" ");
+                neighbours.push(neighbour);
+            }
+        }
+        return new Node(name, neighbours);
+    }
+}
+
 function readInput(filename) {
-    const res = {};
+    const res = {}
 
     const data = fs.readFileSync(filename, "UTF-8");
     const lines = data.split(/\r?\n/);
     lines.forEach((line) => {
-        const firstLevelParts = line.split("bags contain");
-        const root = firstLevelParts[0].trim();
-        res[root] = { edges: [] };
-        if (firstLevelParts[1].trim() !== "no other bags.") {
-            for (node of firstLevelParts[1].split(",")) {
-                const link = node.trim().split("bag")[0].trim().split(" ").slice(1).join(" ");
-                res[root].edges.push(link);
-            }
-        }
+        const newNode = Node.parse(line);
+        res[newNode.name] = newNode;
     });
 
     return res;
 }
 
-function findHowMany(graph, target) {
-    for (node of Object.keys(graph)) {
-        if (graph[node].edges.indexOf(target) !== -1) {
-            graph[node].contains = true;
+function getNodeContainingTarget(graph, targetName) {
+    const containing = {};
+
+    for (node of Object.values(graph)) {
+        if (node.neighbours.indexOf(targetName) !== -1) {
+            containing[node.name] = node;
         }
     }
 
-    for (i = 0; i < 100; i++) { // TODO devo iterare finche' non cambiano piu', ma non penso sia l'approccio piu' perform,ante
-        for (node of Object.keys(graph)) {
-            for (edge of graph[node].edges) {
-                if (graph[edge].contains) {
-                    graph[node].contains = true;
-                    break;
-                }
-            }
-        }
-    }
-    Object.keys(graph).filter((node) => {
-        return graph[node].contains;
-    }).map((node) => {
-        console.log(`${node}: ${JSON.stringify(graph[node])}`);
-    });
-
-    return Object.keys(graph).reduce((acc, node) => {
-        acc += graph[node].contains ? 1 : 0;
-        return acc;
-    }, 0);
+    return containing;
 }
 
+function getAllNodesContainingTarget(graph, target) {
+    const res = new Set();
+    res.add(target);
+    let prevSize = -1;
+    let currSize = res.size;
 
-const res = findHowMany(readInput("./07.part1.input"), "shiny gold");
+    while (prevSize !== currSize) {
+        for (currTarget of res) {
+            const newValues = getNodeContainingTarget(graph, currTarget);
+            for (newValue of Object.keys(newValues)) {
+                res.add(newValue);
+            }
+        }
+        prevSize = currSize;
+        currSize = res.size;
+    }
+    res.delete(target);
+    return res.size;
+}
+
+const res = getAllNodesContainingTarget(readInput("./07.part1.input"), "shiny gold");
 
 console.log(res);
 
-// solution: 
+// solution: 119
