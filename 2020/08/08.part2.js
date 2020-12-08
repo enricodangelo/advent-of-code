@@ -86,4 +86,4 @@ const res = fixBootSequence(readInput("./08.part2.input"));
 
 console.log(res);
 
-// solution: 
+// solution: 920
