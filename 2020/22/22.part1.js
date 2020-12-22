@@ -39,6 +39,14 @@ function playTurn(deck1, deck2) {
     }
 }
 
+function playGame(deck1, deck2) {
+    while (deck1.length > 0 && deck2.length > 0) {
+        playTurn(deck1, deck2);
+    }
+
+    return deck1.length === 0 ? deck2 : deck1;
+}
+
 function getScore(deck) {
     let res = 0;
 
@@ -49,19 +57,7 @@ function getScore(deck) {
     return res;
 }
 
-function playGame(deck1, deck2) {
-    while (deck1.length > 0 && deck2.length > 0) {
-        playTurn(deck1, deck2);
-    }
-
-    if (deck1.length === 0) {
-        return getScore(deck2);
-    } else {
-        return getScore(deck1);
-    }
-}
-
-const res = playGame(...Object.values(readInput("./22.part1.input")));
+const res = getScore(playGame(...Object.values(readInput("./22.part1.input"))));
 
 console.log(res);
 

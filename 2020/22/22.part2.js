@@ -26,28 +26,33 @@ function readInput(filename) {
     return res;
 }
 
-function playSubGame() {
-
-}
-
-function playTurn(deck1, deck2) {
-    const card1 = deck1[0];
-    const card2 = deck2[0];
-
-    if (card1 < deck1.length && card2 < deck2.length) {
-        return playTurn(deck1.slice(1), deck2.slice(1));
-    } else {
-        if (card1 > card2) {
-            deck1.slice(1).concat([card1, card2]);
-            deck2.slice(1);
+function playGame(deck1, deck2) {
+    const alreadyPlayed = new Set();
+    let winner, deck;
+    while (deck1.length !== 0 && deck2.length !== 0) {
+        if (alreadyPlayed.has(deck1 + deck2)) {
+            return { winner: 1, cards: deck1 };
+        }
+        alreadyPlayed.add(deck1 + deck2);
+        const card1 = deck1.shift();
+        const card2 = deck2.shift();
+        if (card1 <= deck1.length && card2 <= deck2.length) {
+            winner = playGame(deck1.slice(0, card1), deck2.slice(0, card2)).winner;
         } else {
-            deck1.slice(1);
-            deck2.slice(1).concat([card2, card1]);
+            winner = card1 > card2 ? 1 : 2;
+        }
+        if (winner === 1) {
+            deck1.push(card1);
+            deck1.push(card2);
+            deck = deck1;
+        } else if (winner === 2) {
+            deck2.push(card2);
+            deck2.push(card1);
+            deck = deck2;
         }
     }
-
-
-}
+    return { winner: winner, deck: deck };
+};
 
 function getScore(deck) {
     let res = 0;
@@ -59,20 +64,8 @@ function getScore(deck) {
     return res;
 }
 
-function playGame(deck1, deck2) {
-    while (deck1.length > 0 && deck2.length > 0) {
-        playTurn(deck1, deck2);
-    }
-
-    if (deck1.length === 0) {
-        return getScore(deck2);
-    } else {
-        return getScore(deck1);
-    }
-}
-
-const res = playGame(...Object.values(readInput("./22.part1.input")));
+const res = getScore(playGame(...Object.values(readInput("./22.part1.input"))).deck);
 
 console.log(res);
 
-// solution: 
+// solution: 33647
